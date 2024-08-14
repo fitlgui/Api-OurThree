@@ -87,3 +87,8 @@ app.post('/login', async (req, res) => {
         res.status(500).send({ error: 'Ocorreu um erro ao fazer login' });
     }
 });
+
+
+app.listen(port, () => {
+    console.log(`Server running on http://localhost:${port}`);
+});
