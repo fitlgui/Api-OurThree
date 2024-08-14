@@ -32,7 +32,7 @@ connectDB();
 
 // Rota de cadastro
 app.post('/register', async (req, res) => {
-    const { username, password } = req.body;
+    const { username, email, password } = req.body;
     const adminKey = req.headers['x-admin-key'];
 
     if (adminKey !== keyAdmin) {
@@ -43,14 +43,16 @@ app.post('/register', async (req, res) => {
         const collection = db.collection('users');
 
         const existingUser = await collection.findOne({ username });
-        if (existingUser) {
-            return res.status(409).send({ error: 'Usuário já existe' });
+        const existingEmail = await collection.findOne({ email });
+        if (existingUser || existingEmail) {
+            return res.status(409).send({ error: 'Usuário Ou Email já existente' });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
         const result = await collection.insertOne({
             username,
+            email,
             password: hashedPassword
         });
 
