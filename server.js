@@ -88,6 +88,65 @@ app.post('/login', async (req, res) => {
     }
 });
 
+// Rota puxar dados do Mongo, para dashboard - App
+app.get('/api/horta', async (req, res) => {
+    try {
+        const hortaData = await db.collection('horta').findOne();
+        res.json(hortaData);
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to fetch data from MongoDB' });
+    }
+});
+
+// Rota para alternar o estado da bomba de água
+app.post('/api/horta/pump', async (req, res) => {
+    const { action } = req.body;
+
+    if (action !== 'on' && action !== 'off') {
+        return res.status(400).json({ error: 'Invalid action. Use "on" or "off".' });
+    }
+
+    try {
+        const updatedData = await db.collection('horta').findOneAndUpdate(
+            {},
+            { $set: { isPumpOn: action === 'on' } },
+            { returnOriginal: false, upsert: true }
+        );
+        res.json({ message: `Pump turned ${action}`, isPumpOn: updatedData.value.isPumpOn });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to update data in MongoDB' });
+    }
+});
+
+// Rota para obter os dados da horta
+app.get('/api/horta', async (req, res) => {
+    try {
+        const hortaData = await db.collection('horta').findOne();
+        res.json(hortaData);
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to fetch data from MongoDB' });
+    }
+});
+
+// Rota para alternar o estado da bomba de água
+app.post('/api/horta/pump', async (req, res) => {
+    const { action } = req.body;
+
+    if (action !== 'on' && action !== 'off') {
+        return res.status(400).json({ error: 'Invalid action. Use "on" or "off".' });
+    }
+
+    try {
+        const updatedData = await db.collection('horta').findOneAndUpdate(
+            {},
+            { $set: { isPumpOn: action === 'on' } },
+            { returnOriginal: false, upsert: true }
+        );
+        res.json({ message: `Pump turned ${action}`, isPumpOn: updatedData.value.isPumpOn });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to update data in MongoDB' });
+    }
+});
 
 app.listen(port, () => {
     console.log(`Server running on http://localhost:${port}`);
